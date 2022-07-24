@@ -16,8 +16,8 @@ public interface PaymentRepo extends CrudRepository<PaymentsToEmployee, String> 
     List<PaymentsToEmployee> findAllByEmail(String email);
 
     @Modifying(clearAutomatically = true)
-    @Transactional
     @Query(value = "UPDATE PAYMENTS_TO_EMPLOYEE SET salary =?3 WHERE employee = ?1 AND period = ?2", nativeQuery = true)
+    @Transactional
     int updateEmployeeSalary( String email, String period, String salary);
 
     @Query(value = "SELECT * FROM PAYMENTS_TO_EMPLOYEE WHERE employee = ?1 ORDER BY period DESC", nativeQuery = true)

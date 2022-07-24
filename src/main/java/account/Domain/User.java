@@ -2,7 +2,10 @@ package account.Domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import account.jpaConverter.ListToString;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -12,6 +15,9 @@ import java.io.Serializable;
 import java.util.List;
 
 @Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class User implements Serializable {
     private static final long serialVersionUID = 1234567L;

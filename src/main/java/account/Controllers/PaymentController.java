@@ -55,7 +55,7 @@ public class PaymentController { // Accountant can 1)access to the employee's pa
     @PutMapping("/acct/payments") //changes the salary of a specific user
     public ResponseEntity<Map<String, String>> changeSalary(@RequestBody PaymentsToEmployee paymentsToEmployeeJson) throws JsonProcessingException, ParseException {
         Map<String, String> responses = new HashMap<>();
-        int updatedRow = 0;
+        int updatedRow;
             EmployeePostOrGetAuthentication employeeAuth = new EmployeePostOrGetAuthentication(paymentsToEmployeeJson, this.paymentRepo, this.userRepo); // checks if @RequestBody data is correct according
                                                                                                                       // the following criteria: 1) employee email must exist in database,
                                                                                                                       //                         2) new period should be future of existing period in database
