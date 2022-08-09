@@ -23,7 +23,7 @@ public class PasswordSecurityChecklist {
         return this.isNotBreached = Arrays.stream(this.breachedPasswords).noneMatch(x -> x.equalsIgnoreCase(newPassword));
     }
     private boolean is12LengthOrMore(String newPassword) { //if a password isn't at least 12 length then throw 400 error
-        if(!newPassword.isBlank()) {
+        if(newPassword != null && !newPassword.isBlank()) {
             return this.is12LengthOrMore = newPassword.length() >= 12;
         }else {
             return this.is12LengthOrMore = false;

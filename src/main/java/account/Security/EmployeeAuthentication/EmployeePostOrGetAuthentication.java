@@ -5,9 +5,11 @@ import account.Domain.User;
 import account.Repositories.PaymentRepo;
 import account.Repositories.UserRepo;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.util.List;
+
 
 public class EmployeePostOrGetAuthentication {
     private String email;
@@ -21,9 +23,9 @@ public class EmployeePostOrGetAuthentication {
 
     public EmployeePostOrGetAuthentication(PaymentsToEmployee paymentsToEmployee, PaymentRepo paymentRepo, UserRepo userRepo) throws JsonProcessingException {
         this.paymentsToEmployee = paymentsToEmployee;
-        this.email = this.paymentsToEmployee.getEmployee();
-        this.salary = this.paymentsToEmployee.getSalary();
-        this.period = this.paymentsToEmployee.getPeriod();
+        this.email = paymentsToEmployee.getEmployee();
+        this.salary = paymentsToEmployee.getSalary();
+        this.period = paymentsToEmployee.getPeriod();
         this.paymentRepo = paymentRepo;
         this.userRepo = userRepo;
     }

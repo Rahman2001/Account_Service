@@ -47,13 +47,14 @@ public class UserAuthController { //User can 1)register on the service, 2)change
                     user.setRoles(List.of("USER")); // else a user is User;
                 }
             }
-            userRepo.save(user);
+            user = userRepo.save(user);
+            User user1 = User.builder().id(user.getId()).email(user.getEmail()).name(user.getName())
+                    .lastname(user.getLastname()).roles(user.getRoles()).build();
 
-            User temp  = this.userRepo.findByEmailIgnoreCase(user.getEmail());
-            List<String> updatedList = temp.getRoles().stream().map(x -> x = "ROLE_" + x).collect(Collectors.toList());
-            temp.setRoles(updatedList);
+            List<String> updatedList = user1.getRoles().stream().map(x -> x = "ROLE_" + x).collect(Collectors.toList());
+            user1.setRoles(updatedList);
 
-            return temp; // otherwise, return requested user details by sending 200 (OK) response
+            return user1; // otherwise, return requested user details by sending 200 (OK) response
         }else {
             throw passwordCheck.falseReason();
         }
