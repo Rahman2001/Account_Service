@@ -33,7 +33,7 @@ public class AdminController { //Admin can  1)change user roles, 2)delete a user
 
         if(this.userRepo.findByEmailIgnoreCase(requestedUserEmail) != null) { // a user must exist in database, otherwise 400 code error is thrown
 
-            if (!requestedUserEmail.equalsIgnoreCase(admin.getEmail())) { // sent JSON data about user role change cannot be performed on administrator.
+            if (!requestedUserEmail.equalsIgnoreCase(admin.getUsername())) { // sent JSON data about user role change cannot be performed on administrator.
                 String role = (String) userMap.get("role");
                 String[] currentRolesOfUser;
 
@@ -84,7 +84,7 @@ public class AdminController { //Admin can  1)change user roles, 2)delete a user
         Map<String, Object> map = new LinkedHashMap<>();
         User userToDelete = this.userRepo.findByEmailIgnoreCase(email);
 
-        if(email.equalsIgnoreCase(admin.getEmail())) {
+        if(email.equalsIgnoreCase(admin.getUsername())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't remove ADMINISTRATOR role!");
         }
         else if(userToDelete == null) {

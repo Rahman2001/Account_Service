@@ -73,10 +73,10 @@ public class UserAuthController { //User can 1)register on the service, 2)change
             if (passwordCheck.hasBasicSecurity("/changepass", newPassword, userDetailsImpl, this.encoder)) { //check by basic security list
                                                                                                                  // otherwise, update a password of a user and return positive response about that
                 Map<String, String> response = new HashMap<>();
-                response.put("email", userDetailsImpl.getEmail().toLowerCase());
+                response.put("email", userDetailsImpl.getUsername().toLowerCase());
                 response.put("status", "The password has been updated successfully");
 
-                return userRepo.updatePassword(userDetailsImpl.getEmail(), encoder.encode(newPassword)) == 1 ?
+                return userRepo.updatePassword(userDetailsImpl.getUsername(), encoder.encode(newPassword)) == 1 ?
                         ResponseEntity.ok(response) : ResponseEntity.badRequest().build();
             } else {
                 throw passwordCheck.falseReason();

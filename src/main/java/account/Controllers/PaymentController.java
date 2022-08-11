@@ -78,7 +78,7 @@ public class PaymentController { // Accountant can 1)access to the employee's pa
        if(userDetails != null) {
            if (period != null) {
                if(Integer.parseInt(period.split("-")[0]) <= 12) { // we check if period has a valid month date
-                   PaymentsToEmployee paymentsToEmployeePayroll = this.paymentRepo.findPaymentsByEmployeePeriod(userDetails.getEmail().toLowerCase(), period);
+                   PaymentsToEmployee paymentsToEmployeePayroll = this.paymentRepo.findPaymentsByEmployeePeriod(userDetails.getUsername().toLowerCase(), period);
                    if (paymentsToEmployeePayroll != null) { // we check if there is any payroll of the employee with such email in database
 
                        Date date = formatOfDate.parse(period);
@@ -96,7 +96,7 @@ public class PaymentController { // Accountant can 1)access to the employee's pa
                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
            }
 
-           List<PaymentsToEmployee> paymentsToEmployeePayrollList = this.paymentRepo.findListOfPeriodsOfEmployee(userDetails.getEmail().toLowerCase());
+           List<PaymentsToEmployee> paymentsToEmployeePayrollList = this.paymentRepo.findListOfPeriodsOfEmployee(userDetails.getUsername().toLowerCase());
            if (!paymentsToEmployeePayrollList.isEmpty()) { // we check if there is a list of payrolls of employee with such email
                List<Map<String, String>> response = new ArrayList<>();
 

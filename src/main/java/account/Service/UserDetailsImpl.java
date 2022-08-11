@@ -12,16 +12,12 @@ import java.util.stream.Collectors;
 
 public class UserDetailsImpl implements UserDetails {
     private Long id;
-    private String name;
-    private String lastname;
     private String email;
     private String password;
     private List<String> roles;
 
     public UserDetailsImpl (User user) {
         this.id = user.getId();
-        this.name = user.getName();
-        this.lastname = user.getLastname();
         this.email = user.getEmail();
         this.password = user.getPassword();
         this.roles = user.getRoles();
@@ -33,16 +29,9 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.name;
-    }
-
-    public String getEmail() {
         return this.email;
     }
 
-    public String getLastname() {
-        return this.lastname;
-    }
     @Override
     public String getPassword() {
         return this.password;
