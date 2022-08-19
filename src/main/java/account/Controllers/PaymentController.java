@@ -30,22 +30,23 @@ public class PaymentController { // Accountant can 1)access to the employee's pa
     private PaymentRepo paymentRepo;
 
 
-
     @PostMapping("/acct/payments") //uploads payrolls
-    public ResponseEntity<Map<String, String>> uploadPayrolls(@RequestBody PaymentsToEmployee[] paymentsToEmployeeJson) throws ParseException, JsonProcessingException {
+    public ResponseEntity<Map<String, String>> uploadPayrolls(@RequestBody PaymentsToEmployee[] paymentsToEmployeeJson,
+                                                              @Autowired EmployeePostOrGetAuthentication employeeAuth) throws ParseException {
         Map<String, String> responses = new HashMap<>();
+        employeeAuth.setPaymentRepo(this.paymentRepo);
+        employeeAuth.setUserRepo(this.userRepo);
 
         for(PaymentsToEmployee paymentsToEmployeeData : paymentsToEmployeeJson) {
-            EmployeePostOrGetAuthentication employeeAuth = new EmployeePostOrGetAuthentication(paymentsToEmployeeData, this.paymentRepo, this.userRepo); // checks if @RequestBody data is correct according
+            employeeAuth.setPaymentsToEmployee(paymentsToEmployeeData);                                              // checks if @RequestBody data is correct according
                                                                                                                      // the following criteria: 1) employee email must exist in database,
                                                                                                                      //                         2) new period should be future of existing period in database
                                                                                                                      //                         3) salary cannot be negative value.
-
             if (employeeAuth.isAuthenticated("post")) {
                 this.paymentRepo.save(employeeAuth.getAuthenticatedEmployee());
                 responses.put("status", "Added successfully!");
             }
-            else{
+            else {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
             }
         }
@@ -53,19 +54,21 @@ public class PaymentController { // Accountant can 1)access to the employee's pa
     }
 
     @PutMapping("/acct/payments") //changes the salary of a specific user
-    public ResponseEntity<Map<String, String>> changeSalary(@RequestBody PaymentsToEmployee paymentsToEmployeeJson) throws JsonProcessingException, ParseException {
+    public ResponseEntity<Map<String, String>> changeSalary(@RequestBody PaymentsToEmployee paymentsToEmployeeJson, @Autowired EmployeePostOrGetAuthentication employeeAuth) throws JsonProcessingException, ParseException {
         Map<String, String> responses = new HashMap<>();
         int updatedRow;
-            EmployeePostOrGetAuthentication employeeAuth = new EmployeePostOrGetAuthentication(paymentsToEmployeeJson, this.paymentRepo, this.userRepo); // checks if @RequestBody data is correct according
+        employeeAuth.setPaymentRepo(this.paymentRepo);
+        employeeAuth.setUserRepo(this.userRepo);
+        employeeAuth.setPaymentsToEmployee(paymentsToEmployeeJson);                                              // checks if @RequestBody data is correct according
                                                                                                                       // the following criteria: 1) employee email must exist in database,
                                                                                                                       //                         2) new period should be future of existing period in database
                                                                                                                       //                         3) salary cannot be negative value.
-            if (employeeAuth.isAuthenticated("put")) {
-                PaymentsToEmployee paymentsToEmployee = employeeAuth.getAuthenticatedEmployee();
-                updatedRow = this.paymentRepo.updateEmployeeSalary(paymentsToEmployee.getUser().getEmail(), paymentsToEmployee.getPeriod() , paymentsToEmployee.getSalary());
-                responses.put("status", "Updated successfully!");
-                return updatedRow == 1 ? ResponseEntity.ok(responses) : ResponseEntity.badRequest().build();
-            }
+        if (employeeAuth.isAuthenticated("put")) {
+            PaymentsToEmployee paymentsToEmployee = employeeAuth.getAuthenticatedEmployee();
+            updatedRow = this.paymentRepo.updateEmployeeSalary(paymentsToEmployee.getUser().getEmail(), paymentsToEmployee.getPeriod(), paymentsToEmployee.getSalary());
+            responses.put("status", "Updated successfully!");
+            return updatedRow == 1 ? ResponseEntity.ok(responses) : ResponseEntity.badRequest().build();
+        }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     }
 

@@ -4,29 +4,31 @@ import account.Domain.PaymentsToEmployee;
 import account.Domain.User;
 import account.Repositories.PaymentRepo;
 import account.Repositories.UserRepo;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.util.List;
 
-
+@Service
+@NoArgsConstructor
 public class EmployeePostOrGetAuthentication {
     private String email;
     private String period;
-    private String salary;
-    private final PaymentRepo paymentRepo;
-    private final UserRepo userRepo;
+    private PaymentRepo paymentRepo;
+    private UserRepo userRepo;
     private PaymentsToEmployee paymentsToEmployee;
     private User user;
 
-
-    public EmployeePostOrGetAuthentication(PaymentsToEmployee paymentsToEmployee, PaymentRepo paymentRepo, UserRepo userRepo) throws JsonProcessingException {
+    public void setPaymentsToEmployee(PaymentsToEmployee paymentsToEmployee) {
         this.paymentsToEmployee = paymentsToEmployee;
         this.email = paymentsToEmployee.getEmployee();
-        this.salary = paymentsToEmployee.getSalary();
         this.period = paymentsToEmployee.getPeriod();
+    }
+    public void setPaymentRepo(PaymentRepo paymentRepo) {
         this.paymentRepo = paymentRepo;
+    }
+    public void setUserRepo(UserRepo userRepo) {
         this.userRepo = userRepo;
     }
     private boolean checkEmail(String email) { // paymentsToEmployee's paymentsToEmployee must exist in our database.
@@ -47,10 +49,10 @@ public class EmployeePostOrGetAuthentication {
                             return false;
                         }
                     }
-
                     return true;
                 }
-            }else return requestType.equalsIgnoreCase("put");
+            }
+            else return requestType.equalsIgnoreCase("put");
         }
         return false; // if the period is not valid, then return false;
     }
