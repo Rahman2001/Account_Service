@@ -27,6 +27,7 @@ import java.util.Map;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -70,14 +71,30 @@ public class paymentControllerTest {
     }
 
     @Test
-    @DisplayName("uploadPayrollsMethod")
+    @DisplayName("uploadPayrollsMethod (200 response)")
     public void uploadPayrollsSuccessfulTest() throws Exception {
         when(this.paymentRepo.save(any(PaymentsToEmployee.class))).thenReturn(this.paymentsToEmployee);
         when(this.userRepo.findByEmailIgnoreCase(anyString())).thenReturn(User.builder().build());
         when(this.paymentRepo.findAllByEmail(anyString())).thenReturn(new ArrayList<>());
 
         this.mockMvc.perform(post("/api/acct/payments").contentType(MediaType.APPLICATION_JSON)
-                .content(this.jsonArray.toString())).andExpect(status().isOk());
+                .content(this.jsonArray.toString())).andExpect(status().isOk()).andExpect(jsonPath("status").value("Added successfully!"));
+
+    }
+
+    @Test
+    @DisplayName("uploadPayrollsMethod (400 response)")
+    public void uploadPayrollsUnsuccessfulTest() throws Exception{
+        when(this.userRepo.findByEmailIgnoreCase(anyString())).thenReturn(null);
+
+        this.mockMvc.perform(post("/api/acct/payments").contentType(MediaType.APPLICATION_JSON)
+                .content(this.jsonArray.toString())).andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    @DisplayName("changeSalaryMethod")
+    public void changeSalarySuccessfulTest() {
 
     }
 }
