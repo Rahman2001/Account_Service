@@ -6,6 +6,7 @@ import account.Domain.PaymentsToEmployee;
 import account.Domain.User;
 import account.Repositories.PaymentRepo;
 import account.Repositories.UserRepo;
+import account.Security.EmployeeAuthentication.EmployeePostOrGetAuthentication;
 import org.json.JSONArray;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,6 +28,7 @@ import java.util.Map;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -94,7 +96,15 @@ public class paymentControllerTest {
 
     @Test
     @DisplayName("changeSalaryMethod")
-    public void changeSalarySuccessfulTest() {
+    public void changeSalarySuccessfulTest() throws Exception {
+        User userForStubbing = User.builder().id(13L).email("rahmanrejepov@acme.com").build();
 
+        when(this.userRepo.findByEmailIgnoreCase(anyString())).thenReturn(userForStubbing);
+        when(this.paymentRepo.findAllByEmail(anyString())).thenReturn(new ArrayList<>());
+        when(this.paymentRepo.updateEmployeeSalary(anyString(), anyString(), anyString())).thenReturn(1);
+
+        this.mockMvc.perform(put("/api/acct/payments").contentType(MediaType.APPLICATION_JSON)
+                .content(String.valueOf(this.jsonArray.get(0)))).andExpect(status().isOk())
+                .andExpect(jsonPath("status").value("Updated successfully!"));
     }
 }

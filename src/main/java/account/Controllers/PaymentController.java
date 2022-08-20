@@ -54,7 +54,8 @@ public class PaymentController { // Accountant can 1)access to the employee's pa
     }
 
     @PutMapping("/acct/payments") //changes the salary of a specific user
-    public ResponseEntity<Map<String, String>> changeSalary(@RequestBody PaymentsToEmployee paymentsToEmployeeJson, @Autowired EmployeePostOrGetAuthentication employeeAuth) throws JsonProcessingException, ParseException {
+    public ResponseEntity<Map<String, String>> changeSalary(@RequestBody PaymentsToEmployee paymentsToEmployeeJson,
+                                                            @Autowired EmployeePostOrGetAuthentication employeeAuth) throws ParseException {
         Map<String, String> responses = new HashMap<>();
         int updatedRow;
         employeeAuth.setPaymentRepo(this.paymentRepo);
