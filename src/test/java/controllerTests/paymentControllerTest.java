@@ -6,7 +6,9 @@ import account.Domain.PaymentsToEmployee;
 import account.Domain.User;
 import account.Repositories.PaymentRepo;
 import account.Repositories.UserRepo;
-import account.Security.EmployeeAuthentication.EmployeePostOrGetAuthentication;
+import account.Service.UserDetailsImpl;
+import account.Service.UserDetailsServiceImpl;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,7 +18,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -24,15 +31,17 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({MockitoExtension.class})
 @SpringBootTest(classes = {AccountServiceApplication.class})
 public class paymentControllerTest {
 
@@ -41,6 +50,9 @@ public class paymentControllerTest {
 
     @Mock
     private UserRepo userRepo;
+
+    @Mock
+    private UserDetailsImpl userDetails;
 
     @InjectMocks
     private PaymentController paymentController;
@@ -66,7 +78,7 @@ public class paymentControllerTest {
         List<Map<String, Object>> listOfMaps = List.of(request, request2);
         this.jsonArray = new JSONArray(listOfMaps); //converting our data into json array so we could send it as data request in our controller method
 
-       this.paymentsToEmployee = PaymentsToEmployee.builder().id(13L).employee("Rahman")
+       this.paymentsToEmployee = PaymentsToEmployee.builder().employee("Rahman")
                .salary("123478").period("01-2022").build(); // data for stubbing
 
         this.mockMvc = MockMvcBuilders.standaloneSetup(this.paymentController).build(); //we want to show to testing framework which controller should be tested and what should be injected into that controller.
@@ -81,7 +93,6 @@ public class paymentControllerTest {
 
         this.mockMvc.perform(post("/api/acct/payments").contentType(MediaType.APPLICATION_JSON)
                 .content(this.jsonArray.toString())).andExpect(status().isOk()).andExpect(jsonPath("status").value("Added successfully!"));
-
     }
 
     @Test
@@ -91,7 +102,6 @@ public class paymentControllerTest {
 
         this.mockMvc.perform(post("/api/acct/payments").contentType(MediaType.APPLICATION_JSON)
                 .content(this.jsonArray.toString())).andExpect(status().isBadRequest());
-
     }
 
     @Test
@@ -106,5 +116,20 @@ public class paymentControllerTest {
         this.mockMvc.perform(put("/api/acct/payments").contentType(MediaType.APPLICATION_JSON)
                 .content(String.valueOf(this.jsonArray.get(0)))).andExpect(status().isOk())
                 .andExpect(jsonPath("status").value("Updated successfully!"));
+    }
+
+    //The test class below is not working well for some unknown reasons. Please, do not try to run it!
+    @Test
+    @DisplayName("getEmployeePayrollsMethod with period parameter")
+    public void getEmployeePayrollsSuccessfulTest() throws Exception {
+        User userToAuthenticate = User.builder().id(13L)
+                .email("rahman@acme.com").name("Rahman").lastname("Rejepov")
+                .password("dolceGabana77").roles(List.of("USER")).build();
+
+      when(this.paymentRepo.findPaymentsByEmployeePeriod(anyString(), anyString())).thenReturn(this.paymentsToEmployee);
+
+        this.mockMvc.perform(get("/api/empl/payment").param("period", "01-2022").with(user(new UserDetailsImpl(userToAuthenticate))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("name").value("Rahman"));
     }
 }

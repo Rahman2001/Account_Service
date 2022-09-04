@@ -5,7 +5,6 @@ import account.Repositories.PaymentRepo;
 import account.Repositories.UserRepo;
 import account.Security.EmployeeAuthentication.EmployeePostOrGetAuthentication;
 import account.Service.UserDetailsImpl;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -125,6 +124,6 @@ public class PaymentController { // Accountant can 1)access to the employee's pa
            }
            return ResponseEntity.ok(new ArrayList<LinkedHashMap<String, String>>());
        }
-       return ResponseEntity.status(401).build();
+       return ResponseEntity.status(401).build(); //Unauthorized status.
    }
 }
